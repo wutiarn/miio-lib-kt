@@ -41,7 +41,7 @@ internal class Packet(
             return messageBytes
         }
 
-        fun decodePacket(packetBytes: ByteArray, token: Token): Packet {
+        fun decodePacket(packetBytes: ByteArray, token: Token?): Packet {
             val buffer = ByteBuffer.wrap(packetBytes)
 
             val magic = buffer.short
@@ -59,7 +59,7 @@ internal class Packet(
 
             val dataLength = length - 32
             val payload = when {
-                dataLength > 0 -> ByteArray(dataLength)
+                dataLength > 0 && token != null -> ByteArray(dataLength)
                     .also { buffer.get(it) }
                     .let { encryptedBytes ->
                         val decryptedBytes = token.decrypt(encryptedBytes)
@@ -76,6 +76,11 @@ internal class Packet(
             )
 
             if (payload != null) {
+                if (token == null) {
+                    // Payload is not decoded if token is not provided.
+                    // So if we have decoded payload - token can't be null.
+                    throw IllegalStateException("Token is null, but payload is not")
+                }
                 buffer.position(16)
                 buffer.put(token.tokenBytes)
 
