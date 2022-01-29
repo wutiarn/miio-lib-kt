@@ -28,6 +28,8 @@ dependencies {
     // Use the Kotlin JDK 8 standard library.
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.1")
+
     testImplementation(kotlin("test"))
     testImplementation("org.assertj:assertj-core:3.22.0")
 }
