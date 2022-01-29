@@ -13,6 +13,7 @@ plugins {
 
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
+    `maven-publish`
 }
 
 repositories {
@@ -32,4 +33,16 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "ru.wtrn.miio"
+            artifactId = "miio-lib"
+            version = "1.0-SNAPSHOT"
+
+            from(components["kotlin"])
+        }
+    }
 }
