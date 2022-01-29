@@ -45,4 +45,13 @@ publishing {
             from(components["kotlin"])
         }
     }
+    repositories {
+        maven {
+            url = uri("https://maven.pkg.github.com/wutiarn/miio-lib-kt")
+            credentials {
+                username = project.findProperty("gpr.user")?.toString() ?: "wutiarn"
+                password = project.findProperty("gpr.token")?.toString() ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 }
