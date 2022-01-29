@@ -29,6 +29,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
     testImplementation(kotlin("test"))
+    testImplementation("org.assertj:assertj-core:3.22.0")
 }
 
 tasks.test {
