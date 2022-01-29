@@ -4,6 +4,13 @@ import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
+/**
+ * MiIo Device Token
+ *
+ * Used for message encryption, decryption and authentication.
+ *
+ * This implementation is thread safe.
+ */
 class Token(tokenHex: String) {
     internal val tokenBytes = tokenHex.hexStringToByteArray()
 
