@@ -2,7 +2,7 @@ package ru.wtrn.miio
 
 import java.nio.ByteBuffer
 
-data class Packet(
+internal class Packet(
     val deviceId: Int,
     val miioTimestamp: Int,
     val payload: String?
@@ -39,6 +39,53 @@ data class Packet(
             buffer.put(md5)
 
             return messageBytes
+        }
+
+        fun decodePacket(packetBytes: ByteArray, token: Token): Packet {
+            val buffer = ByteBuffer.wrap(packetBytes)
+
+            val magic = buffer.short
+            if (magic != MAGIC) {
+                throw IncorrectMiIoMagicHeaderException(magic)
+            }
+
+            val length = buffer.short.toInt()
+
+            buffer.int // skip unknown1 header
+
+            val deviceId = buffer.int
+            val timestamp = buffer.int
+            val checksum = ByteArray(16).also { buffer.get(it) }
+
+            val dataLength = length - 32
+            val payload = when {
+                dataLength > 0 -> ByteArray(dataLength)
+                    .also { buffer.get(it) }
+                    .let { encryptedBytes ->
+                        val decryptedBytes = token.decrypt(encryptedBytes)
+                        String(decryptedBytes)
+                    }
+                else -> null
+            }
+
+            buffer.rewind()
+            val decodedPacket = Packet(
+                deviceId = deviceId,
+                miioTimestamp = timestamp,
+                payload = payload
+            )
+
+            if (payload != null) {
+                buffer.position(16)
+                buffer.put(token.tokenBytes)
+
+                val actualMd5 = packetBytes.md5()
+                if (!checksum.contentEquals(actualMd5)) {
+                    throw IncorrectMiIoChecksumException()
+                }
+            }
+
+            return decodedPacket
         }
     }
 }
