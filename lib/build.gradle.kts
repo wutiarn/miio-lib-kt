@@ -35,7 +35,11 @@ dependencies {
 }
 
 tasks.test {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        if (System.getenv("RUN_LOCAL_TESTS") != "true") {
+            this.excludeTags = setOf("local")
+        }
+    }
 }
 
 publishing {

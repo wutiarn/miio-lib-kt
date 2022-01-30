@@ -1,12 +1,12 @@
 package ru.wtrn.miio
 
-import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
 internal class DeviceTest {
 
     @Test
-    @Disabled
+    @Tag("local")
     fun sendCommand() {
         val token = Token("259b3cfe0f1763d5f5b04e60000bd705")
         val device = Device(

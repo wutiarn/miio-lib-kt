@@ -8,7 +8,7 @@ internal class Packet(
     val payload: String?
 ) {
     companion object {
-        internal const val MAGIC = 0x2131.toShort()
+        private const val MAGIC = 0x2131.toShort()
         internal val HELLO = ByteBuffer.allocate(32)
             .putShort(MAGIC)
             .putShort(32.toShort())
