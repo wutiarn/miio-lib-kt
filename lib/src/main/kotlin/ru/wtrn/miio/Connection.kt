@@ -9,10 +9,10 @@ import java.util.concurrent.atomic.AtomicReference
 internal class Connection(private val ipAddress: InetAddress) {
     private val activeSocket: AtomicReference<DatagramSocket> = AtomicReference()
 
-    fun sendAndReceive(request: ByteArray): DatagramPacket {
+    fun sendAndReceive(request: ByteArray): ByteArray {
         return withSocket { socket ->
             send(socket, request)
-            receive(socket)
+            receive(socket).data
         }
     }
 
@@ -46,4 +46,9 @@ internal class Connection(private val ipAddress: InetAddress) {
     }
 }
 
-//internal class ConnectionHolder()
+internal class ConnectionHolder(private val connection: Connection) {
+    @Synchronized
+    fun <T> use(action: (Connection) -> T): T {
+        return action(connection)
+    }
+}
