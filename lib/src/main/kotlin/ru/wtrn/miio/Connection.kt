@@ -26,11 +26,14 @@ internal class Connection(private val ipAddress: InetAddress) {
         socket.send(datagramPacket)
     }
 
-    private fun receive(socket: DatagramSocket): DatagramPacket {
+    private fun receive(socket: DatagramSocket): ReceivedPacket {
         val rcv = ByteArray(65507)
         val receivedPacket = DatagramPacket(rcv, rcv.size);
         socket.receive(receivedPacket)
-        return receivedPacket
+        return ReceivedPacket(
+            data = rcv.copyOfRange(0, receivedPacket.length),
+            srcAddress = receivedPacket.address
+        )
     }
 
     @Synchronized
@@ -44,6 +47,11 @@ internal class Connection(private val ipAddress: InetAddress) {
         }
         return action(socket)
     }
+
+    class ReceivedPacket(
+        val data: ByteArray,
+        val srcAddress: InetAddress
+    )
 }
 
 internal class ConnectionHolder(private val connection: Connection) {

@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import java.net.InetAddress
 import java.net.SocketTimeoutException
 
-class Device(val ipAddress: InetAddress, val token: Token) {
-    private val connectionHolder = ConnectionHolder(Connection(ipAddress))
+class Device(val ipAddress: String, val token: Token) {
+    private val connectionHolder = ConnectionHolder(Connection(InetAddress.getByName(ipAddress)))
 
     fun sendCommand(command: Command): String? {
         return connectionHolder.use { connection ->
