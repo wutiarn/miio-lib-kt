@@ -47,7 +47,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "ru.wtrn.miio"
             artifactId = "miio-lib"
-            version = "1.0-SNAPSHOT"
+            version = "1.1-SNAPSHOT"
 
             from(components["kotlin"])
         }
