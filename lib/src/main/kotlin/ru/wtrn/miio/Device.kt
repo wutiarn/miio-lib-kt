@@ -6,10 +6,10 @@ import java.net.InetAddress
 import java.net.SocketTimeoutException
 
 class Device(val ipAddress: String, val token: Token) {
-    private val connectionHolder = ConnectionHolder(Connection(InetAddress.getByName(ipAddress)))
+    private val connectionFactory = Connection.Factory(InetAddress.getByName(ipAddress))
 
     fun sendCommand(command: Command): String? {
-        return connectionHolder.use { connection ->
+        return connectionFactory.withConnection { connection ->
             val handshakeResponse = handshake(connection)
 
             val commandJsonNode = objectMapper.valueToTree<ObjectNode>(command)

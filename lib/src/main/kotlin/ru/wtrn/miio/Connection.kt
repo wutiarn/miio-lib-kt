@@ -1,16 +1,19 @@
 package ru.wtrn.miio
 
+import java.io.Closeable
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
 import java.time.Duration
 
-internal class Connection(private val ipAddress: InetAddress) {
+internal class Connection private constructor(private val ipAddress: InetAddress) : Closeable {
+    private val socket = DatagramSocket().also {
+        it.soTimeout = Duration.ofSeconds(5).toMillis().toInt()
+    }
+
     fun sendAndReceive(request: ByteArray): ByteArray {
-        return withSocket { socket ->
-            send(socket, request)
-            receive(socket).data
-        }
+        send(socket, request)
+        return receive(socket).data
     }
 
     private fun send(socket: DatagramSocket, request: ByteArray) {
@@ -33,23 +36,20 @@ internal class Connection(private val ipAddress: InetAddress) {
         )
     }
 
-    @Synchronized
-    private fun <T> withSocket(action: (DatagramSocket) -> T): T {
-        val socket = DatagramSocket().also {
-            it.soTimeout = Duration.ofSeconds(5).toMillis().toInt()
-        }
-        return socket.use(action)
+    override fun close() {
+        socket.close()
     }
 
     class ReceivedPacket(
         val data: ByteArray,
         val srcAddress: InetAddress
     )
-}
 
-internal class ConnectionHolder(private val connection: Connection) {
-    @Synchronized
-    fun <T> use(action: (Connection) -> T): T {
-        return action(connection)
+    internal class Factory(private val ipAddress: InetAddress) {
+        @Synchronized
+        fun <T> withConnection(action: (Connection) -> T): T {
+            val connection = Connection(ipAddress)
+            return connection.use(action)
+        }
     }
 }
