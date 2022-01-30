@@ -45,20 +45,11 @@ tasks.test {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            groupId = "ru.wtrn.miio"
-            artifactId = "miio-lib"
-            version = "1.1-SNAPSHOT"
+            groupId = "com.github.wutiarn"
+            artifactId = "miio-lib-kt"
+            version = "master-SNAPSHOT"
 
             from(components["kotlin"])
-        }
-    }
-    repositories {
-        maven {
-            url = uri("https://maven.pkg.github.com/wutiarn/miio-lib-kt")
-            credentials {
-                username = project.findProperty("gpr.user")?.toString() ?: "wutiarn"
-                password = project.findProperty("gpr.token")?.toString() ?: System.getenv("GITHUB_TOKEN")
-            }
         }
     }
 }

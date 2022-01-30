@@ -9,4 +9,3 @@
  */
 
 rootProject.name = "miio-lib-kt"
-include("lib")
