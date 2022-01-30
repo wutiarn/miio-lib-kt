@@ -4,11 +4,8 @@ import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
 import java.time.Duration
-import java.util.concurrent.atomic.AtomicReference
 
 internal class Connection(private val ipAddress: InetAddress) {
-    private val activeSocket: AtomicReference<DatagramSocket> = AtomicReference()
-
     fun sendAndReceive(request: ByteArray): ByteArray {
         return withSocket { socket ->
             send(socket, request)
@@ -38,14 +35,10 @@ internal class Connection(private val ipAddress: InetAddress) {
 
     @Synchronized
     private fun <T> withSocket(action: (DatagramSocket) -> T): T {
-        var socket = activeSocket.get()
-        if (socket?.isClosed != false) {
-            socket = DatagramSocket().also {
-                it.soTimeout = Duration.ofSeconds(5).toMillis().toInt()
-            }
-            activeSocket.set(socket)
+        val socket = DatagramSocket().also {
+            it.soTimeout = Duration.ofSeconds(5).toMillis().toInt()
         }
-        return action(socket)
+        return socket.use(action)
     }
 
     class ReceivedPacket(
